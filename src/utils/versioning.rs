@@ -29,3 +29,11 @@ impl DataVersion for IsoDateVersion {
         Regex::new(r"\d{8}").unwrap()
     }
 }
+
+pub struct Unversioned {}
+
+impl DataVersion for Unversioned {
+    fn pattern(&self) -> Regex {
+        Regex::new(r"").unwrap()
+    }
+}

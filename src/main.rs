@@ -42,8 +42,7 @@ enum Commands {
     Dir,
     Get(GetArgs),
     Clean(CleanArgs),
-    ListLocal(ListLocalArgs),
-    ListRemote(ListRemoteArgs),
+    List(ListArgs),
 }
 
 #[derive(Args)]
@@ -69,37 +68,37 @@ struct CleanArgs {
 }
 
 #[derive(clap::ValueEnum, Clone, Default, Debug)]
-enum ListLocalPrintMode {
+enum ListPrintMode {
     #[default]
     Filename,
     Version,
     Path,
 }
 
-impl Display for ListLocalPrintMode {
+impl Display for ListPrintMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ListLocalPrintMode::Filename => write!(f, "filename"),
-            ListLocalPrintMode::Version => write!(f, "version"),
-            ListLocalPrintMode::Path => write!(f, "path"),
+            ListPrintMode::Filename => write!(f, "filename"),
+            ListPrintMode::Version => write!(f, "version"),
+            ListPrintMode::Path => write!(f, "path"),
         }
     }
 }
 
 #[derive(Args, Debug)]
-struct ListLocalArgs {
+struct ListArgs {
     source: String,
-    #[arg(short, long, default_value_t = ListLocalPrintMode::Filename)]
-    mode: ListLocalPrintMode,
+    #[arg(short, long, default_value_t = ListPrintMode::Filename)]
+    mode: ListPrintMode,
 }
 
-fn list_local(args: &ListLocalArgs) {
+fn list(args: &ListArgs) {
     if let Ok(provider) = get_provider(&args.source) {
         if let Ok(dir) = provider.get_data_dir() {
             for entry in fs::read_dir(dir).unwrap() {
                 let entry = entry.unwrap();
                 match args.mode {
-                    ListLocalPrintMode::Version => {
+                    ListPrintMode::Version => {
                         let file_name = entry.file_name();
                         let caps = provider
                             .file_pattern()
@@ -107,19 +106,14 @@ fn list_local(args: &ListLocalArgs) {
                             .unwrap();
                         println!("{}", caps.get(1).unwrap().as_str())
                     }
-                    ListLocalPrintMode::Path => println!("{}", entry.path().display()),
-                    ListLocalPrintMode::Filename => {
+                    ListPrintMode::Path => println!("{}", entry.path().display()),
+                    ListPrintMode::Filename => {
                         println!("{}", entry.file_name().to_str().unwrap())
                     }
                 }
             }
         }
     }
-}
-
-#[derive(Args)]
-struct ListRemoteArgs {
-    source: String,
 }
 
 fn dir() -> () {
@@ -139,7 +133,6 @@ fn main() {
         Commands::Dir => dir(),
         Commands::Get(s) => println!("get {:?}", s.sources),
         Commands::Clean(_) => println!("clean"),
-        Commands::ListLocal(args) => list_local(args),
-        Commands::ListRemote(_) => println!("list remote"),
+        Commands::List(args) => list(args),
     }
 }
