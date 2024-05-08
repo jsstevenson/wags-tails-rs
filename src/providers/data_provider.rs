@@ -60,6 +60,12 @@ pub trait DataProvider {
             Err(e) => Err(e.to_string()),
         }
     }
+
+    fn parse_version(&self, file_name: &str) -> Result<String, String> {
+        let caps = &self.file_pattern().captures(file_name).unwrap();
+        let version_str = caps.get(1).unwrap().as_str();
+        Ok(String::from(version_str))
+    }
 }
 
 pub fn get_provider(source_name: &str) -> Result<Box<dyn DataProvider>, String> {

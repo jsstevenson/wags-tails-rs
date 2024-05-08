@@ -1,3 +1,7 @@
+/* Stuff that this could do:
+ * Help with comparators/sorting
+ * Provide more specific version patterns
+ */
 // use std::cmp::Ordering;
 
 use regex::Regex;

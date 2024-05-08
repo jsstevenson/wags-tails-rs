@@ -100,11 +100,8 @@ fn list(args: &ListArgs) {
                 match args.mode {
                     ListPrintMode::Version => {
                         let file_name = entry.file_name();
-                        let caps = provider
-                            .file_pattern()
-                            .captures(file_name.to_str().unwrap())
-                            .unwrap();
-                        println!("{}", caps.get(1).unwrap().as_str())
+                        let version = provider.parse_version(file_name.to_str().unwrap());
+                        println!("{}", version.unwrap());
                     }
                     ListPrintMode::Path => println!("{}", entry.path().display()),
                     ListPrintMode::Filename => {
