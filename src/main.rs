@@ -56,6 +56,18 @@ struct GetArgs {
     refresh: bool,
 }
 
+fn get(args: &GetArgs) {
+    let from_local = &args.from_local;
+    for source in &args.sources {
+        if let Ok(provider) = get_provider(source) {
+            if let Ok(latest_data) = provider.get_latest_data(from_local) {
+                println!("{}", latest_data.display());
+            }
+        }
+    }
+}
+
+
 #[derive(Args)]
 struct CleanArgs {
     sources: Vec<String>,
@@ -128,7 +140,7 @@ fn main() {
 
     match &cli.command {
         Commands::Dir => dir(),
-        Commands::Get(s) => println!("get {:?}", s.sources),
+        Commands::Get(args) => get(args),
         Commands::Clean(_) => println!("clean"),
         Commands::List(args) => list(args),
     }
